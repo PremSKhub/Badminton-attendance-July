@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Badminton Attendance - July 2025</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 10px 40px;
+    }
+    header {
+      width: 100%;
+      height: 130px;
+      background: url('https://images.unsplash.com/photo-1598514982884-616ee042a535?auto=format&fit=crop&w=800&q=80') no-repeat center center/cover;
+      text-align: center;
+      padding-top: 30px;
+      box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 0 0 8px #00ffcc;
+    }
+    main {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255 255 255 / 0.1);
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ffccaa;
+      padding: 15px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255 255 255 / 0.2);
+      white-space: nowrap;
+      position: relative;
+    }
+    th {
+      background: rgba(0, 204, 131, 0.7);
+      font-weight: 600;
+      letter-spacing: 1.1px;
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(255 255 255 / 0.05);
+    }
+    tbody tr:hover {
+      background: rgba(0, 204, 131, 0.3);
+    }
+    .ranking {
+      font-weight: 700;
+      color: #00e676;
+    }
+    button.view-dates-btn {
+      background: #00e676;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 0.85rem;
+      color: #003300;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button.view-dates-btn:hover {
+      background: #00cc5a;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: #002222;
+      color: #b2f2bb;
+      max-width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 15px #00ffcc;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    .modal h2 {
+      margin-top: 0;
+      color: #00ffcc;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #00ffcc;
+      cursor: pointer;
+    }
+    .updated-note {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #ffd54f;
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.3rem;
+      }
+      table {
+        font-size: 0.85rem;
+      }
+      th, td {
+        padding: 8px 6px;
+      }
+      button.view-dates-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🏸 Attendance Summary - July 2025</h1>
+</header>
+
+<main>
+  <table>
+    <thead>
+      <tr>
+        <th>Sr. No</th>
+        <th>Name</th>
+        <th>Attendance %</th>
+        <th>Ranking</th>
+        <th>Dates</th>
+      </tr>
+    </thead>
+    <tbody id="summary-tbody"></tbody>
+  </table>
+  <div class="updated-note">Last updated on: July 2, 2025</div>
+</main>
+
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close">&times;</button>
+    <h2>Attendance Dates</h2>
+    <ul id="datesList"></ul>
+  </div>
+</div>
+
+<script>
+  const friends = ["Balaji","Bala Krishnan","Darshan","Prem","Vasanth","Vicky","Vinoth"];
+  const attendanceDataRaw = {
+    "July 1": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
+    "July 2": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"]
+  };
+  const attendanceData = {};
+  for (const [date, players] of Object.entries(attendanceDataRaw)) {
+    attendanceData[date] = players.map(p => {
+      if (p === "Singam" || p === "Bala") return "Bala Krishnan";
+      return p;
+    });
+  }
+
+  const totalDaysPlayed = Object.values(attendanceData).filter(d => d.length).length;
+  const attendanceInfo = {};
+  friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
+
+  for (const [date, players] of Object.entries(attendanceData)) {
+    players.forEach(p => {
+      if (friends.includes(p)) {
+        attendanceInfo[p].count++;
+        attendanceInfo[p].dates.push(date);
+      }
+    });
+  }
+
+  const attendanceArray = friends.map(name => {
+    const info = attendanceInfo[name];
+    const percent = (info.count / totalDaysPlayed) * 100;
+    return { name, count: info.count, percent, dates: info.dates };
+  }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
+
+  let rank = 0, lastPercent = null, skip = 0;
+  attendanceArray.forEach((item, i) => {
+    if (item.percent !== lastPercent) {
+      rank += 1 + skip;
+      skip = 0;
+    } else {
+      skip++;
+    }
+    item.rank = rank;
+    lastPercent = item.percent;
+  });
+
+  const tbody = document.getElementById("summary-tbody");
+  attendanceArray.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${item.name}</td>
+      <td>${item.percent.toFixed(1)}%</td>
+      <td class="ranking">${item.rank}</td>
+      <td><button class="view-dates-btn" data-name="${item.name}">View Dates</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const datesList = document.getElementById('datesList');
+  const modalCloseBtn = modalOverlay.querySelector('.modal-close');
+
+  tbody.addEventListener('click', e => {
+    if (e.target.classList.contains('view-dates-btn')) {
+      const name = e.target.dataset.name;
+      const player = attendanceArray.find(p => p.name === name);
+      datesList.innerHTML = '';
+      player.dates.forEach(date => {
+        const li = document.createElement('li');
+        li.textContent = date;
+        datesList.appendChild(li);
+      });
+      modalOverlay.style.display = 'flex';
+    }
+  });
+
+  modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
+  modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
+</script>
+
+</body>
+</html>

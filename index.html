@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Badminton Attendance - July 2025</title>
+  <title>Badminton Attendance Summary - July 2025</title>
   <style>
     * {
       box-sizing: border-box;
@@ -53,7 +53,6 @@
       text-align: center;
       border-bottom: 1px solid rgba(255 255 255 / 0.2);
       white-space: nowrap;
-      position: relative;
     }
     th {
       background: rgba(0, 204, 131, 0.7);
@@ -119,11 +118,11 @@
       color: #00ffcc;
       cursor: pointer;
     }
-    .updated-note {
-      margin-top: 15px;
+    .updated-text {
+      margin: 20px 0 10px;
+      font-size: 1rem;
       font-weight: bold;
-      color: #ffd54f;
-      text-align: center;
+      color: #00ffcc;
     }
     @media (max-width: 480px) {
       header h1 {
@@ -136,8 +135,8 @@
         padding: 8px 6px;
       }
       button.view-dates-btn {
-        padding: 8px 16px;
-        font-size: 0.85rem;
+        padding: 6px 10px;
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -149,6 +148,7 @@
 </header>
 
 <main>
+  <div class="updated-text">📅 Last updated on: July 3, 2025</div>
   <table>
     <thead>
       <tr>
@@ -161,7 +161,6 @@
     </thead>
     <tbody id="summary-tbody"></tbody>
   </table>
-  <div class="updated-note">Last updated on: July 2, 2025</div>
 </main>
 
 <div id="modalOverlay" class="modal-overlay">
@@ -173,17 +172,16 @@
 </div>
 
 <script>
-  const friends = ["Balaji","Bala Krishnan","Darshan","Prem","Vasanth","Vicky","Vinoth"];
+  const friends = ["Balaji", "Bala Krishnan", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"];
   const attendanceDataRaw = {
-    "July 1": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 2": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"]
+    "July 1": ["Balaji", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+    "July 2": ["Balaji", "Darshan", "Bala Krishnan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+    "July 3": ["Balaji", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"]
   };
+
   const attendanceData = {};
   for (const [date, players] of Object.entries(attendanceDataRaw)) {
-    attendanceData[date] = players.map(p => {
-      if (p === "Singam" || p === "Bala") return "Bala Krishnan";
-      return p;
-    });
+    attendanceData[date] = players.map(p => (p === "Singam" || p === "Bala") ? "Bala Krishnan" : p);
   }
 
   const totalDaysPlayed = Object.values(attendanceData).filter(d => d.length).length;
@@ -210,9 +208,7 @@
     if (item.percent !== lastPercent) {
       rank += 1 + skip;
       skip = 0;
-    } else {
-      skip++;
-    }
+    } else skip++;
     item.rank = rank;
     lastPercent = item.percent;
   });

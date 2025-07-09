@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Badminton Attendance - July 2025</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,7 +15,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 0 10px 40px;
+      padding: 0 10px 60px;
     }
     header {
       width: 100%;
@@ -115,11 +113,27 @@
       cursor: pointer;
     }
     .last-updated {
-      margin-top: 25px;
+      margin-top: 20px;
       font-size: 0.9rem;
       font-weight: bold;
       color: #ffea00;
       text-shadow: 0 0 5px #000;
+    }
+    .stamp {
+      margin-top: 30px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at center, #00ffcc, #007f66);
+      color: #001f1f;
+      font-weight: bold;
+      font-size: 0.75rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px #00ffcc;
+      text-align: center;
+      padding: 10px;
     }
     @media (max-width: 480px) {
       header h1 {
@@ -153,8 +167,10 @@
     </thead>
     <tbody id="summary-tbody"></tbody>
   </table>
-  <div class="last-updated">📅 Last updated on: July 5, 2025</div>
+  <div class="last-updated">📅 Last updated on: July 9, 2025</div>
 </main>
+
+<div class="stamp">🎁 Rewards<br>Loading...</div>
 
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal">
@@ -171,23 +187,37 @@
     "July 2": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 3": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
     "July 4": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 5": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"]
+    "July 5": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
+    "July 6": ["Balaji","Darshan","Vasanth","Vinoth"],
+    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky","Vinoth"],
+    "July 8": ["Darshan","Prem","Vasanth","Vicky","Vinoth"],
+    "July 9": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Bala Krishnan"]
   };
+
+  const exceptions = {
+    "Vinoth": ["July 7"]
+  };
+
   const attendanceData = {};
   for (const [date, players] of Object.entries(attendanceDataRaw)) {
-    attendanceData[date] = players.map(p => (p === "Bala") ? "Bala Krishnan" : p);
+    attendanceData[date] = players.map(p => p === "Bala" ? "Bala Krishnan" : p);
   }
+
   const totalDaysPlayed = Object.values(attendanceData).filter(d => d.length).length;
   const attendanceInfo = {};
   friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
+
   for (const [date, players] of Object.entries(attendanceData)) {
     players.forEach(p => {
       if (friends.includes(p)) {
         attendanceInfo[p].count++;
-        attendanceInfo[p].dates.push(date);
+        let label = date;
+        if (exceptions[p]?.includes(date)) label += " (Exception)";
+        attendanceInfo[p].dates.push(label);
       }
     });
   }
+
   const attendanceArray = friends.map(name => {
     const info = attendanceInfo[name];
     const percent = (info.count / totalDaysPlayed) * 100;

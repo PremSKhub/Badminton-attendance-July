@@ -15,7 +15,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 0 10px 60px;
+      padding: 0 10px 40px;
     }
     header {
       width: 100%;
@@ -113,37 +113,44 @@
       cursor: pointer;
     }
     .last-updated {
-      margin-top: 20px;
+      margin-top: 25px;
       font-size: 0.9rem;
       font-weight: bold;
       color: #ffea00;
       text-shadow: 0 0 5px #000;
+      text-align: center;
     }
-    .stamp {
-      margin-top: 30px;
-      width: 120px;
-      height: 120px;
-      background: radial-gradient(circle at center, #00ffcc, #007f66);
-      color: #001f1f;
-      font-weight: bold;
-      font-size: 0.75rem;
+
+    .reward-stamp {
+      margin-top: 20px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
+      border: 4px dashed #00ffcc;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 15px #00ffcc;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: #00ffcc;
       text-align: center;
-      padding: 10px;
+      animation: rotate 4s linear infinite;
+      box-shadow: 0 0 10px #00ffcc;
     }
+
+    @keyframes rotate {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 480px) {
-      header h1 {
-        font-size: 1.3rem;
-      }
-      table {
-        font-size: 0.85rem;
-      }
-      th, td {
-        padding: 8px 6px;
+      header h1 { font-size: 1.3rem; }
+      table { font-size: 0.85rem; }
+      th, td { padding: 8px 6px; }
+      .reward-stamp {
+        width: 100px;
+        height: 100px;
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -167,10 +174,9 @@
     </thead>
     <tbody id="summary-tbody"></tbody>
   </table>
-  <div class="last-updated">📅 Last updated on: July 9, 2025</div>
+  <div class="last-updated">📅 Last updated on: July 11, 2025</div>
+  <div class="reward-stamp">🎁 Rewards<br/>Loading...</div>
 </main>
-
-<div class="stamp">🎁 Rewards<br>Loading...</div>
 
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal">
@@ -189,30 +195,29 @@
     "July 4": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 5": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 6": ["Balaji","Darshan","Vasanth","Vinoth"],
-    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky","Vinoth"],
+    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky","Vinoth"], // Exception
     "July 8": ["Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 9": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Bala Krishnan"]
-  };
-
-  const exceptions = {
-    "Vinoth": ["July 7"]
+    "July 9": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Bala Krishnan"],
+    "July 10": ["Balaji","Darshan","Prem","Vinoth","Vicky"],
+    "July 11": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"]
   };
 
   const attendanceData = {};
   for (const [date, players] of Object.entries(attendanceDataRaw)) {
-    attendanceData[date] = players.map(p => p === "Bala" ? "Bala Krishnan" : p);
+    attendanceData[date] = players.map(p => (p === "Bala") ? "Bala Krishnan" : p);
   }
 
   const totalDaysPlayed = Object.values(attendanceData).filter(d => d.length).length;
   const attendanceInfo = {};
   friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
-
   for (const [date, players] of Object.entries(attendanceData)) {
     players.forEach(p => {
       if (friends.includes(p)) {
         attendanceInfo[p].count++;
         let label = date;
-        if (exceptions[p]?.includes(date)) label += " (Exception)";
+        if (p === "Vinoth" && new Date(date + ", 2025").getDay() === 1) {
+          label += " (Exception)";
+        }
         attendanceInfo[p].dates.push(label);
       }
     });
@@ -266,7 +271,9 @@
   });
 
   modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
-  modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
+  modalOverlay.onclick = e => {
+    if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+  };
 </script>
 
 </body>

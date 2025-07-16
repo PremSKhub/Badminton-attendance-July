@@ -15,7 +15,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 0 10px 40px;
+      padding: 0 10px 60px;
     }
     header {
       width: 100%;
@@ -67,14 +67,43 @@
       font-weight: 700;
       color: #00e676;
     }
+    .note {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      color: #ffcc00;
+    }
+    .last-updated {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #ffea00;
+      text-shadow: 0 0 5px #000;
+    }
+    .rewards-loading {
+      margin-top: 25px;
+      text-align: center;
+    }
+    .circle-loader {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 4px solid #00e676;
+      border-top: 4px solid transparent;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     button.view-dates-btn {
       background: #00e676;
       border: none;
       border-radius: 4px;
-      padding: 5px 10px;
+      padding: 6px 10px;
       font-size: 0.85rem;
       color: #003300;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
     }
     .modal-overlay {
@@ -98,10 +127,6 @@
       font-size: 1rem;
       line-height: 1.4;
     }
-    .modal h2 {
-      margin-top: 0;
-      color: #00ffcc;
-    }
     .modal-close {
       position: absolute;
       top: 10px;
@@ -112,47 +137,10 @@
       color: #00ffcc;
       cursor: pointer;
     }
-    .last-updated {
-      margin-top: 25px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #ffea00;
-      text-shadow: 0 0 5px #000;
-      text-align: center;
-    }
-
-    .reward-stamp {
-  margin: 20px auto 0;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 4px dashed #00ffcc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.95rem;
-  color: #00ffcc;
-  text-align: center;
-  animation: rotate 4s linear infinite;
-  box-shadow: 0 0 10px #00ffcc;
-}
-
-
-    @keyframes rotate {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(360deg); }
-    }
-
     @media (max-width: 480px) {
       header h1 { font-size: 1.3rem; }
       table { font-size: 0.85rem; }
       th, td { padding: 8px 6px; }
-      .reward-stamp {
-        width: 100px;
-        height: 100px;
-        font-size: 0.8rem;
-      }
     }
   </style>
 </head>
@@ -175,8 +163,35 @@
     </thead>
     <tbody id="summary-tbody"></tbody>
   </table>
-  <div class="last-updated">📅 Last updated on: July 11, 2025</div>
-  <div class="reward-stamp">🎁 Rewards<br/>Loading...</div>
+
+  <div class="note">📌 Rewards loading only for eligible participants 🎁</div>
+  <div class="rewards-loading">
+    <div class="circle-loader"></div>
+    <div style="margin-top: 6px; font-size: 0.85rem;">Rewards Loading...</div>
+  </div>
+
+  <br><br>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Attendance %</th>
+        <th>Note</th>
+        <th>Dates</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nehru</td>
+        <td id="nehru-percent">100%</td>
+        <td style="color:#ffcc00;font-weight:bold;">Not considered for ranking/rewards<br>(From July 14 to July 31)</td>
+        <td><button class="view-dates-btn" data-name="Nehru">View Dates</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="last-updated">📅 Last updated on: July 16, 2025</div>
 </main>
 
 <div id="modalOverlay" class="modal-overlay">
@@ -189,44 +204,44 @@
 
 <script>
   const friends = ["Balaji","Bala Krishnan","Darshan","Prem","Vasanth","Vicky","Vinoth"];
-  const attendanceDataRaw = {
+  const newMember = "Nehru";
+
+  const attendanceData = {
     "July 1": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
     "July 2": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 3": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
     "July 4": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 5": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
     "July 6": ["Balaji","Darshan","Vasanth","Vinoth"],
-    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky","Vinoth"], // Exception
+    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky"],
     "July 8": ["Darshan","Prem","Vasanth","Vicky","Vinoth"],
     "July 9": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Bala Krishnan"],
     "July 10": ["Balaji","Darshan","Prem","Vinoth","Vicky"],
-    "July 11": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"]
+    "July 11": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
+    "July 12": ["Balaji","Darshan","Bala Krishnan","Vicky","Vinoth","Vasanth"],
+    "July 13": [],
+    "July 14": ["Darshan","Bala Krishnan","Vinoth","Vasanth","Nehru"],
+    "July 15": ["Balaji","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth","Nehru"],
+    "July 16": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Nehru"]
   };
 
-  const attendanceData = {};
-  for (const [date, players] of Object.entries(attendanceDataRaw)) {
-    attendanceData[date] = players.map(p => (p === "Bala") ? "Bala Krishnan" : p);
-  }
+  const totalDays = Object.entries(attendanceData).filter(([_, list]) => list.length).length;
 
-  const totalDaysPlayed = Object.values(attendanceData).filter(d => d.length).length;
   const attendanceInfo = {};
   friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
+
   for (const [date, players] of Object.entries(attendanceData)) {
     players.forEach(p => {
       if (friends.includes(p)) {
         attendanceInfo[p].count++;
-        let label = date;
-        if (p === "Vinoth" && new Date(date + ", 2025").getDay() === 1) {
-          label += " (Exception)";
-        }
-        attendanceInfo[p].dates.push(label);
+        attendanceInfo[p].dates.push(date);
       }
     });
   }
 
   const attendanceArray = friends.map(name => {
     const info = attendanceInfo[name];
-    const percent = (info.count / totalDaysPlayed) * 100;
+    const percent = (info.count / totalDays) * 100;
     return { name, count: info.count, percent, dates: info.dates };
   }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
 
@@ -253,16 +268,20 @@
     tbody.appendChild(tr);
   });
 
+  const nehruDates = ["July 14","July 15","July 16"];
+
   const modalOverlay = document.getElementById('modalOverlay');
   const datesList = document.getElementById('datesList');
   const modalCloseBtn = modalOverlay.querySelector('.modal-close');
 
-  tbody.addEventListener('click', e => {
+  document.body.addEventListener('click', e => {
     if (e.target.classList.contains('view-dates-btn')) {
       const name = e.target.dataset.name;
-      const player = attendanceArray.find(p => p.name === name);
       datesList.innerHTML = '';
-      player.dates.forEach(date => {
+      const dates = (name === newMember)
+        ? nehruDates
+        : attendanceArray.find(p => p.name === name).dates;
+      dates.forEach(date => {
         const li = document.createElement('li');
         li.textContent = date;
         datesList.appendChild(li);
@@ -272,9 +291,7 @@
   });
 
   modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
-  modalOverlay.onclick = e => {
-    if (e.target === modalOverlay) modalOverlay.style.display = 'none';
-  };
+  modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
 </script>
 
 </body>

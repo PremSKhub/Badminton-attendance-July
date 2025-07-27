@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Badminton Attendance - July 2025</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,21 +21,24 @@
       min-height: 100vh;
       padding: 0 10px 60px;
     }
+
     header {
       width: 100%;
       height: 130px;
       background: url('https://images.unsplash.com/photo-1598514982884-616ee042a535?auto=format&fit=crop&w=800&q=80') no-repeat center center/cover;
       text-align: center;
       padding-top: 30px;
-      box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.5);
+      box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.5);
       margin-bottom: 20px;
     }
+
     header h1 {
       margin: 0;
       font-size: 1.8rem;
       font-weight: 700;
       text-shadow: 0 0 8px #00ffcc;
     }
+
     main {
       width: 100%;
       max-width: 700px;
@@ -41,38 +48,47 @@
       padding: 15px;
       overflow-x: auto;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.95rem;
     }
-    th, td {
+
+    th,
+    td {
       padding: 10px;
       text-align: center;
       border-bottom: 1px solid rgba(255 255 255 / 0.2);
       white-space: nowrap;
     }
+
     th {
       background: rgba(0, 204, 131, 0.7);
       font-weight: 600;
       letter-spacing: 1.1px;
     }
+
     tbody tr:nth-child(even) {
       background: rgba(255 255 255 / 0.05);
     }
+
     tbody tr:hover {
       background: rgba(0, 204, 131, 0.3);
     }
+
     .ranking {
       font-weight: 700;
       color: #00e676;
     }
+
     .note {
       text-align: center;
       font-size: 0.9rem;
       margin-top: 10px;
       color: #ffcc00;
     }
+
     .last-updated {
       margin-top: 20px;
       font-size: 0.9rem;
@@ -80,22 +96,46 @@
       color: #ffea00;
       text-shadow: 0 0 5px #000;
     }
+
     .rewards-loading {
       margin-top: 25px;
       text-align: center;
     }
+
+    /* New eye-catching animated circle loader */
     .circle-loader {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 4px solid #00e676;
-      border-top: 4px solid transparent;
-      animation: spin 1s linear infinite;
+      position: relative;
       margin: 0 auto;
+      box-sizing: border-box;
+      animation: rotate 1.5s linear infinite;
+      background: conic-gradient(from 0deg,
+          #00e676 0deg 90deg,
+          #00ffc8 90deg 180deg,
+          #00e676 180deg 270deg,
+          #00ffc8 270deg 360deg);
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+
+    .circle-loader::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 28px;
+      height: 28px;
+      background: #002222;
+      border-radius: 50%;
+      box-shadow: inset 0 0 8px #004d40;
     }
+
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     button.view-dates-btn {
       background: #00e676;
       border: none;
@@ -106,15 +146,20 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
     }
+
     .modal {
       background: #002222;
       color: #b2f2bb;
@@ -126,7 +171,9 @@
       box-shadow: 0 0 15px #00ffcc;
       font-size: 1rem;
       line-height: 1.4;
+      position: relative;
     }
+
     .modal-close {
       position: absolute;
       top: 10px;
@@ -137,162 +184,191 @@
       color: #00ffcc;
       cursor: pointer;
     }
+
     @media (max-width: 480px) {
-      header h1 { font-size: 1.3rem; }
-      table { font-size: 0.85rem; }
-      th, td { padding: 8px 6px; }
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th,
+      td {
+        padding: 8px 6px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<header>
-  <h1>🏸 Attendance Summary - July 2025</h1>
-</header>
+  <header>
+    <h1>🏸 Attendance Summary - July 2025</h1>
+  </header>
 
-<main>
-  <table>
-    <thead>
-      <tr>
-        <th>Sr. No</th>
-        <th>Name</th>
-        <th>Attendance %</th>
-        <th>Ranking</th>
-        <th>Dates</th>
-      </tr>
-    </thead>
-    <tbody id="summary-tbody"></tbody>
-  </table>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Sr. No</th>
+          <th>Name</th>
+          <th>Attendance %</th>
+          <th>Ranking</th>
+          <th>Dates</th>
+        </tr>
+      </thead>
+      <tbody id="summary-tbody"></tbody>
+    </table>
 
-  <div class="note">📌 Rewards loading only for eligible participants 🎁</div>
-  <div class="rewards-loading">
-    <div class="circle-loader"></div>
-    <div style="margin-top: 6px; font-size: 0.85rem;">Rewards Loading...</div>
+    <div class="note">📌 Rewards loading only for eligible participants 🎁</div>
+    <div class="rewards-loading">
+      <div class="circle-loader"></div>
+      <div style="margin-top: 6px; font-size: 0.85rem;">Rewards Loading...</div>
+    </div>
+
+    <br><br>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Attendance %</th>
+          <th>Note</th>
+          <th>Dates</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nehru</td>
+          <td id="nehru-percent">100%</td>
+          <td style="color:#ffcc00;font-weight:bold;">Not considered for ranking/rewards<br>(From July 14 to July 31)
+          </td>
+          <td><button class="view-dates-btn" data-name="Nehru">View Dates</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="last-updated">📅 Last updated on: July 27, 2025</div>
+  </main>
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <button class="modal-close">&times;</button>
+      <h2>Attendance Dates</h2>
+      <ul id="datesList"></ul>
+    </div>
   </div>
 
-  <br><br>
+  <script>
+    const friends = ["Balaji", "Bala Krishnan", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"];
+    const newMember = "Nehru";
 
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Attendance %</th>
-        <th>Note</th>
-        <th>Dates</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Nehru</td>
-        <td id="nehru-percent">100%</td>
-        <td style="color:#ffcc00;font-weight:bold;">Not considered for ranking/rewards<br>(From July 14 to July 31)</td>
-        <td><button class="view-dates-btn" data-name="Nehru">View Dates</button></td>
-      </tr>
-    </tbody>
-  </table>
+    const attendanceData = {
+      "July 1": ["Balaji", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 2": ["Balaji", "Darshan", "Bala Krishnan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 3": ["Balaji", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 4": ["Balaji", "Darshan", "Bala Krishnan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 5": ["Balaji", "Darshan", "Bala Krishnan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 6": ["Balaji", "Darshan", "Vasanth", "Vinoth"],
+      "July 7": ["Balaji", "Darshan", "Bala Krishnan", "Vasanth", "Vicky"],
+      "July 8": ["Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 9": ["Balaji", "Prem", "Vasanth", "Vicky", "Vinoth", "Bala Krishnan"],
+      "July 10": ["Balaji", "Darshan", "Prem", "Vinoth", "Vicky"],
+      "July 11": ["Balaji", "Darshan", "Prem", "Vasanth", "Vicky", "Vinoth"],
+      "July 12": ["Balaji", "Darshan", "Bala Krishnan", "Vicky", "Vinoth", "Vasanth"],
+      "July 13": [],
+      "July 14": ["Darshan", "Bala Krishnan", "Vinoth", "Vasanth", "Nehru"],
+      "July 15": ["Balaji", "Bala Krishnan", "Prem", "Vasanth", "Vicky", "Vinoth", "Nehru"],
+      "July 16": ["Balaji", "Prem", "Vasanth", "Vicky", "Vinoth", "Nehru"],
+      "July 17": ["Bala Krishnan", "Darshan", "Prem", "Vasanth", "Vicky", "Nehru"],
+      "July 18": ["Darshan", "Prem", "Vasanth", "Vicky", "Vinoth", "Nehru"],
+      "July 19": ["Balaji", "Darshan", "Prem", "Vicky", "Vinoth", "Nehru"],
+      "July 20": ["Balaji", "Darshan", "Prem", "Vasanth", "Vinoth", "Bala Krishnan"],
+      "July 21": ["Balaji", "Prem", "Bala Krishnan", "Vasanth", "Vicky"],
+      "July 22": ["Balaji", "Prem", "Darshan", "Vicky", "Vasanth", "Vinoth"],
+      "July 23": ["Prem", "Vicky"],
+      "July 24": ["Prem", "Bala Krishnan", "Vasanth", "Vicky", "Vinoth"],
+      "July 25": ["Balaji", "Vasanth", "Vicky"],
+      "July 26": ["Darshan", "Balaji", "Bala Krishnan", "Vasanth", "Vicky", "Prem", "Vinoth"],
+      "July 27": []
+    };
 
-  <div class="last-updated">📅 Last updated on: July 16, 2025</div>
-</main>
+    const totalDays = Object.entries(attendanceData).filter(([_, list]) => list.length).length;
 
-<div id="modalOverlay" class="modal-overlay">
-  <div class="modal">
-    <button class="modal-close">&times;</button>
-    <h2>Attendance Dates</h2>
-    <ul id="datesList"></ul>
-  </div>
-</div>
+    const attendanceInfo = {};
+    friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
 
-<script>
-  const friends = ["Balaji","Bala Krishnan","Darshan","Prem","Vasanth","Vicky","Vinoth"];
-  const newMember = "Nehru";
+    for (const [date, players] of Object.entries(attendanceData)) {
+      players.forEach(p => {
+        if (friends.includes(p)) {
+          attendanceInfo[p].count++;
+          attendanceInfo[p].dates.push(date);
+        }
+      });
+    }
 
-  const attendanceData = {
-    "July 1": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 2": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 3": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 4": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 5": ["Balaji","Darshan","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 6": ["Balaji","Darshan","Vasanth","Vinoth"],
-    "July 7": ["Balaji","Darshan","Bala Krishnan","Vasanth","Vicky"],
-    "July 8": ["Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 9": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Bala Krishnan"],
-    "July 10": ["Balaji","Darshan","Prem","Vinoth","Vicky"],
-    "July 11": ["Balaji","Darshan","Prem","Vasanth","Vicky","Vinoth"],
-    "July 12": ["Balaji","Darshan","Bala Krishnan","Vicky","Vinoth","Vasanth"],
-    "July 13": [],
-    "July 14": ["Darshan","Bala Krishnan","Vinoth","Vasanth","Nehru"],
-    "July 15": ["Balaji","Bala Krishnan","Prem","Vasanth","Vicky","Vinoth","Nehru"],
-    "July 16": ["Balaji","Prem","Vasanth","Vicky","Vinoth","Nehru"]
-  };
+    const attendanceArray = friends.map(name => {
+      const info = attendanceInfo[name];
+      const percent = (info.count / totalDays) * 100;
+      return { name, count: info.count, percent, dates: info.dates };
+    }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
 
-  const totalDays = Object.entries(attendanceData).filter(([_, list]) => list.length).length;
-
-  const attendanceInfo = {};
-  friends.forEach(name => attendanceInfo[name] = { count: 0, dates: [] });
-
-  for (const [date, players] of Object.entries(attendanceData)) {
-    players.forEach(p => {
-      if (friends.includes(p)) {
-        attendanceInfo[p].count++;
-        attendanceInfo[p].dates.push(date);
-      }
+    let rank = 0, lastPercent = null, skip = 0;
+    attendanceArray.forEach((item, i) => {
+      if (item.percent !== lastPercent) {
+        rank += 1 + skip;
+        skip = 0;
+      } else skip++;
+      item.rank = rank;
+      lastPercent = item.percent;
     });
-  }
 
-  const attendanceArray = friends.map(name => {
-    const info = attendanceInfo[name];
-    const percent = (info.count / totalDays) * 100;
-    return { name, count: info.count, percent, dates: info.dates };
-  }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
-
-  let rank = 0, lastPercent = null, skip = 0;
-  attendanceArray.forEach((item, i) => {
-    if (item.percent !== lastPercent) {
-      rank += 1 + skip;
-      skip = 0;
-    } else skip++;
-    item.rank = rank;
-    lastPercent = item.percent;
-  });
-
-  const tbody = document.getElementById("summary-tbody");
-  attendanceArray.forEach((item, idx) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+    const tbody = document.getElementById("summary-tbody");
+    attendanceArray.forEach((item, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${item.name}</td>
       <td>${item.percent.toFixed(1)}%</td>
       <td class="ranking">${item.rank}</td>
       <td><button class="view-dates-btn" data-name="${item.name}">View Dates</button></td>
     `;
-    tbody.appendChild(tr);
-  });
+      tbody.appendChild(tr);
+    });
 
-  const nehruDates = ["July 14","July 15","July 16"];
+    const nehruDates = [
+      "July 14", "July 15", "July 16", "July 17", "July 18", "July 19",
+      "July 21", "July 22", "July 24", "July 25"
+    ];
+    const nehruPercent = (nehruDates.length / 14) * 100;
+    document.getElementById("nehru-percent").textContent = `${nehruPercent.toFixed(1)}%`;
 
-  const modalOverlay = document.getElementById('modalOverlay');
-  const datesList = document.getElementById('datesList');
-  const modalCloseBtn = modalOverlay.querySelector('.modal-close');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const datesList = document.getElementById('datesList');
+    const modalCloseBtn = modalOverlay.querySelector('.modal-close');
 
-  document.body.addEventListener('click', e => {
-    if (e.target.classList.contains('view-dates-btn')) {
-      const name = e.target.dataset.name;
-      datesList.innerHTML = '';
-      const dates = (name === newMember)
-        ? nehruDates
-        : attendanceArray.find(p => p.name === name).dates;
-      dates.forEach(date => {
-        const li = document.createElement('li');
-        li.textContent = date;
-        datesList.appendChild(li);
-      });
-      modalOverlay.style.display = 'flex';
-    }
-  });
+    document.body.addEventListener('click', e => {
+      if (e.target.classList.contains('view-dates-btn')) {
+        const name = e.target.dataset.name;
+        datesList.innerHTML = '';
+        const dates = (name === newMember)
+          ? nehruDates
+          : attendanceArray.find(p => p.name === name).dates;
+        dates.forEach(date => {
+          const li = document.createElement('li');
+          li.textContent = date;
+          datesList.appendChild(li);
+        });
+        modalOverlay.style.display = 'flex';
+      }
+    });
 
-  modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
-  modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
-</script>
+    modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
+    modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
+  </script>
 
 </body>
+
 </html>

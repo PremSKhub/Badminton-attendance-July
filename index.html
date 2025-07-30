@@ -97,43 +97,29 @@
       text-shadow: 0 0 5px #000;
     }
 
-    .rewards-loading {
+    .spin-wheel-container {
       margin-top: 25px;
       text-align: center;
     }
 
-    /* New eye-catching animated circle loader */
-    .circle-loader {
-      width: 40px;
-      height: 40px;
+    .spin-wheel-image {
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      position: relative;
-      margin: 0 auto;
-      box-sizing: border-box;
-      animation: rotate 1.5s linear infinite;
-      background: conic-gradient(from 0deg,
-          #00e676 0deg 90deg,
-          #00ffc8 90deg 180deg,
-          #00e676 180deg 270deg,
-          #00ffc8 270deg 360deg);
+      box-shadow: 0 0 15px #00ffc8;
+      cursor: pointer;
+      transition: transform 0.3s ease;
     }
 
-    .circle-loader::before {
-      content: "";
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      width: 28px;
-      height: 28px;
-      background: #002222;
-      border-radius: 50%;
-      box-shadow: inset 0 0 8px #004d40;
+    .spin-wheel-image:hover {
+      transform: scale(1.1);
     }
 
-    @keyframes rotate {
-      100% {
-        transform: rotate(360deg);
-      }
+    .spin-wheel-text {
+      color: #00ffcc;
+      font-weight: bold;
+      margin-top: 8px;
+      font-size: 1rem;
     }
 
     button.view-dates-btn {
@@ -223,9 +209,14 @@
     </table>
 
     <div class="note">📌 Rewards loading only for eligible participants 🎁</div>
-    <div class="rewards-loading">
-      <div class="circle-loader"></div>
-      <div style="margin-top: 6px; font-size: 0.85rem;">Rewards Loading...</div>
+
+    <!-- Replaced circle loader with clickable Spin the Wheel image -->
+    <div class="spin-wheel-container">
+      <a href="spinner.html" target="_blank" rel="noopener noreferrer">
+        <img src="https://cdn-icons-png.flaticon.com/512/4315/4315445.png" alt="Spin the Wheel"
+          class="spin-wheel-image" />
+        <div class="spin-wheel-text">🎁 Spin to Win</div>
+      </a>
     </div>
 
     <br><br>
@@ -250,7 +241,7 @@
       </tbody>
     </table>
 
-    <div class="last-updated">📅 Last updated on: July 28, 2025</div>
+    <div class="last-updated">📅 Last updated on: July 30, 2025</div>
   </main>
 
   <div id="modalOverlay" class="modal-overlay">
@@ -294,6 +285,8 @@
       "July 26": ["Darshan", "Balaji", "Bala Krishnan", "Vasanth", "Vicky", "Prem", "Vinoth"],
       "July 27": [],
       "July 28": ["Darshan", "Balaji", "Bala Krishnan", "Vasanth", "Vicky", "Prem"],
+      "July 29": ["Darshan", "Balaji", "Vasanth", "Vicky", "Prem"],
+      "July 30": ["Balaji", "Vasanth", "Vicky", "Prem"],
     };
 
     const totalDays = Object.entries(attendanceData).filter(([_, list]) => list.length).length;
@@ -341,7 +334,7 @@
 
     const nehruDates = [
       "July 14", "July 15", "July 16", "July 17", "July 18", "July 19",
-      "July 21", "July 22", "July 24", "July 25", "July 28"
+      "July 21", "July 22", "July 24", "July 25", "July 28", "July 29"
     ];
     const nehruPercent = (nehruDates.length / 14) * 100;
     document.getElementById("nehru-percent").textContent = `${nehruPercent.toFixed(1)}%`;
@@ -367,7 +360,9 @@
     });
 
     modalCloseBtn.onclick = () => modalOverlay.style.display = 'none';
-    modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; }
+    modalOverlay.onclick = e => {
+      if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+    }
   </script>
 
 </body>

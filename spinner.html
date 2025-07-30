@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spin the Wheel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0 15px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      box-shadow: 0 0 20px rgba(0,255,128,0.5);
+      border-radius: 50%;
+      background: #121212;
+    }
+
+    canvas {
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    #spin-container {
+      margin-top: 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #spin {
+      padding: 14px 40px;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00ff99, #00cc66);
+      color: #111;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow:
+        0 4px 15px rgba(0, 255, 153, 0.6),
+        inset 0 -2px 5px rgba(0, 200, 100, 0.8);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    #spin:hover:not(:disabled) {
+      background: linear-gradient(90deg, #00cc66, #00ff99);
+      box-shadow:
+        0 6px 20px rgba(0, 255, 153, 0.9),
+        inset 0 -3px 6px rgba(0, 200, 100, 1);
+    }
+    #spin:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+      color: #bbb;
+    }
+
+    #spin-count {
+      font-size: 24px;
+      font-weight: 700;
+      color: #00ff99;
+      font-family: 'Courier New', Courier, monospace;
+      user-select: none;
+      min-width: 50px;
+      text-align: center;
+      padding: 8px 0;
+      border-radius: 12px;
+      background: rgba(0, 255, 153, 0.15);
+      box-shadow: 0 0 10px rgba(0, 255, 153, 0.4);
+      transition: background 0.3s ease;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 22px;
+      color: #00ff99;
+      font-weight: 700;
+      text-shadow: 0 0 6px #00ff99, 0 0 10px #00cc66;
+      min-height: 28px;
+      text-align: center;
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      width: 10px;
+      height: 10px;
+      background: yellow;
+      position: absolute;
+      animation: fall 2s linear infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wheel-container">
+    <canvas id="wheel" width="320" height="320"></canvas>
+  </div>
+
+  <div id="spin-container">
+    <button id="spin">🎁 SPIN</button>
+    <span id="spin-count">(2)</span>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const rewards = ["Grip", "Sweatband", "Water Bottle", "Microfiber Towel", "Socks", "Fee Discount", "Own Choice"];
+    const colors = ["#FF5733", "#33FF57", "#3357FF", "#F1C40F", "#9B59B6", "#E67E22", "#1ABC9C"];
+    const wheelCanvas = document.getElementById("wheel");
+    const ctx = wheelCanvas.getContext("2d");
+    const spinBtn = document.getElementById("spin");
+    const spinCountSpan = document.getElementById("spin-count");
+    const resultDiv = document.getElementById("result");
+
+    let currentAngle = 0;
+    const slices = rewards.length;
+    const sliceAngle = 2 * Math.PI / slices;
+
+    let selectedSlice = -1;
+
+    const maxSpins = 2;
+
+    // Allowed indexes for selection: Grip(0), Sweatband(1), Socks(4), Own Choice(6)
+    const allowedIndexes = [0, 1, 4, 6];
+
+    // Load from localStorage or initialize
+    let spinCount = parseInt(localStorage.getItem('spinCount')) || 0;
+    let pickedIndexes = JSON.parse(localStorage.getItem('pickedIndexes')) || [];
+
+    function updateSpinCountDisplay() {
+      const spinsLeft = maxSpins - spinCount;
+      spinCountSpan.textContent = `(${spinsLeft})`;
+    }
+
+    function saveState() {
+      localStorage.setItem('spinCount', spinCount);
+      localStorage.setItem('pickedIndexes', JSON.stringify(pickedIndexes));
+    }
+
+    function drawWheel() {
+      for (let i = 0; i < slices; i++) {
+        const startAngle = i * sliceAngle;
+        const endAngle = startAngle + sliceAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 150, startAngle, endAngle);
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+
+        if (i === selectedSlice) {
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = "#00FF00";
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = "#00FF00";
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 14px Arial";
+        ctx.fillText(rewards[i], 140, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (spinCount >= maxSpins) {
+        return;
+      }
+
+      spinBtn.disabled = true;
+      selectedSlice = -1;
+
+      const remainingOptions = allowedIndexes.filter(i => !pickedIndexes.includes(i));
+      if (remainingOptions.length === 0) {
+        // All options picked, no spin
+        spinBtn.disabled = true;
+        spinBtn.textContent = "No more spins 🎉";
+        return;
+      }
+
+      const selectedIndex = remainingOptions[Math.floor(Math.random() * remainingOptions.length)];
+      pickedIndexes.push(selectedIndex);
+
+      const degreesPerSlice = 360 / slices;
+      const fullSpins = 5;
+      const targetAngle = fullSpins * 360 + (slices - 1 - selectedIndex + 0.5) * degreesPerSlice;
+
+      const duration = 5000;
+      let start = null;
+
+      function rotate(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+
+        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+        const progress = Math.min(easeOut(elapsed / duration), 1);
+        const angle = targetAngle * progress;
+
+        currentAngle = angle;
+        const angleRad = (angle * Math.PI) / 180;
+
+        ctx.clearRect(0, 0, 320, 320);
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(angleRad);
+        ctx.translate(-160, -160);
+        drawWheel();
+        ctx.restore();
+
+        if (progress < 1) {
+          requestAnimationFrame(rotate);
+        } else {
+          showResult(targetAngle);
+          spinCount++;
+          updateSpinCountDisplay();
+          saveState();
+          if (spinCount >= maxSpins) {
+            spinBtn.disabled = true;
+            spinBtn.textContent = "No more spins 🎉";
+          } else {
+            spinBtn.disabled = false;
+          }
+        }
+      }
+
+      requestAnimationFrame(rotate);
+    }
+
+    function showResult(angle) {
+      const normalizedAngle = angle % 360;
+      const index = slices - 1 - Math.floor(normalizedAngle / (360 / slices));
+      const reward = rewards[index];
+
+      selectedSlice = index;
+
+      ctx.clearRect(0, 0, 320, 320);
+      ctx.save();
+      ctx.translate(160, 160);
+      ctx.rotate((currentAngle * Math.PI) / 180);
+      ctx.translate(-160, -160);
+      drawWheel();
+      ctx.restore();
+
+      resultDiv.innerHTML = `🎉 Congrats! You won "<b>${reward}</b>"`;
+
+      // Confetti burst
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti-piece");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() + "s";
+        confetti.style.top = "-10px";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 2000);
+      }
+    }
+
+    spinBtn.addEventListener("click", spinWheel);
+
+    // On page load, update UI according to saved state
+    updateSpinCountDisplay();
+    if (spinCount >= maxSpins) {
+      spinBtn.disabled = true;
+      spinBtn.textContent = "No more spins 🎉";
+    }
+    drawWheel();
+  </script>
+</body>
+</html>
